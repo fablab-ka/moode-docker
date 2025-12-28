@@ -1,44 +1,79 @@
-# Moode Audio for x86 Docker
+# Moode Audio for Docker
 
-This project provides a Dockerized environment to run Moode Audio on x86_64 systems (Debian-based).
+This project provides a Dockerized environment to run Moode Audio on Docker (Debian-based).
 
 ## Prerequisites
 
 - Docker
 - Docker Compose
+- Git
 
 ## Setup
 
-1.  Clone the Moode Audio source code (or use the Makefile):
-    ```bash
-    make setup
-    ```
-    This clones the upstream Moode repository into `source/`.
+### 1. Get the Code & Submodules
 
-2.  Build the image:
-    ```bash
-    make build
-    ```
+If you haven't already, clone the repository and initialize the submodules:
 
-3.  Run the container:
-    ```bash
-    make up
-    ```
+```bash
+git clone <repository-url>
+cd moode-docker
+git submodule update --init --recursive
+```
 
-4.  Access Moode at `http://localhost:80`.
+### 2. Run with Docker Compose (Recommended)
+
+Build and start the container in detached mode:
+
+```bash
+docker compose up -d --build
+```
+
+To stop the container:
+
+```bash
+docker compose down
+```
+
+### 3. Run with Docker (Manual)
+
+**Build the image:**
+
+```bash
+docker build -t moode-player .
+```
+
+**Run the container:**
+
+```bash
+docker run -d \
+  --name moode \
+  -p 80:80 \
+  -p 6600:6600 \
+  -v "$(pwd)/music:/var/lib/mpd/music" \
+  -v moode-db:/var/local/www/db \
+  -v moode-data:/var/local/www \
+  moode-player
+```
+
+### Exposed Ports and Volumes
+
+**Ports:**
+- `80`: Web interface (Nginx).
+- `6600`: MPD (Music Player Daemon) protocol.
+
+**Volumes:**
+- `/var/lib/mpd/music`: Your music library.
+- `/var/local/www`: Application data, including configuration and covers.
+- `/var/local/www/db`: SQLite database storage.
 
 ## Architecture
 
-- **Base Image:** Debian Bookworm (Slim)
-- **Services:** Nginx, PHP 8.2-FPM, MPD, SQLite3.
-- **Persistence:**
-    - `moode-data`: Stores `/var/local/www` (Database, Images, Command scripts).
-    - `moode-db`: (Legacy/Redundant) Stores `/var/local/www/db`.
-    - `./music`: Mapped to `/var/lib/mpd/music` (Add your music here).
+- **Base Image:** Debian Trixie (Slim)
+- **Services:** Nginx, PHP 8.4-FPM, MPD, SQLite3.
 
 ## Notes
 
-- This is a port of the Moode Audio web interface and player daemon to a standard x86 Docker environment.
+- This is a port of the Moode Audio web interface and player daemon to a standard Docker environment.
 - Hardware-specific features (GPIO, Raspberry Pi specific drivers) are disabled or non-functional.
 - MPD is configured to output to a "Null" output by default. You may need to configure ALSA or PulseAudio forwarding for actual sound output.
 
