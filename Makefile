@@ -3,25 +3,20 @@
 REPO_URL=https://github.com/moode-player/moode.git
 
 setup:
-	@if [ ! -d "source" ]; then \
-		echo "Cloning Moode Audio source..."; \
-		git clone --depth 1 $(REPO_URL) source; \
-	else \
-		echo "Source already present."; \
-	fi
+	git submodule update --init --recursive
 
 build: setup
-	docker-compose build
+	docker compose build
 
 up:
-	docker-compose up -d
+	docker compose up -d
 
 down:
-	docker-compose down
+	docker compose down
 
 clean:
-	docker-compose down -v
+	docker compose down -v
 	rm -rf source
 
 shell:
-	docker-compose exec moode bash
+	docker compose exec moode bash

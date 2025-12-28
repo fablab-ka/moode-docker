@@ -28,7 +28,7 @@ chown -R www-data:www-data /var/local/www
 
 # Start PHP-FPM
 echo "Starting PHP-FPM..."
-/etc/init.d/php8.2-fpm start
+/etc/init.d/php8.4-fpm start
 
 # Start MPD
 echo "Starting MPD..."

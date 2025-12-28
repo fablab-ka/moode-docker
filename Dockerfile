@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -61,9 +61,6 @@ COPY source/etc/nginx/fastcgi_params.overwrite /etc/nginx/fastcgi_params
 
 # Enable site
 RUN ln -s /etc/nginx/sites-available/moode /etc/nginx/sites-enabled/moode
-
-# Fix PHP socket path in moode-locations.conf (8.4 -> 8.2)
-RUN sed -i 's/php8.4-fpm.sock/php8.2-fpm.sock/g' /etc/nginx/moode-locations.conf
 
 # Configure MPD
 # Create a basic mpd.conf since Moode's is generated
