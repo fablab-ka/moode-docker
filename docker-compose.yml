@@ -1,0 +1,16 @@
+services:
+  moode:
+    build: .
+    container_name: moode
+    ports:
+      - "80:80"
+      - "6600:6600"
+    volumes:
+      - ./music:/var/lib/mpd/music
+      - moode-db:/var/local/www/db
+      - moode-data:/var/local/www
+    restart: unless-stopped
+
+volumes:
+  moode-db:
+  moode-data:
