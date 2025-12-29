@@ -23,6 +23,7 @@ EXCLUDE_LIST=(
     "camilladsp"
     "camillagui"
     "caps"
+    "librespot"
     "libupnpp16"
     "libnpupnp13"
     "log2ram"
