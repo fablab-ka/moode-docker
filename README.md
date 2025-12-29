@@ -72,9 +72,15 @@ docker run -d \
 
 - **Base Image:** Debian Trixie (Slim)
 - **Services:** Nginx, PHP 8.4-FPM, MPD, SQLite3.
+- **Audio Services:**
+  - **MPD:** Music Player Daemon (installed via apt).
+  - **Shairport Sync:** AirPlay receiver (installed via apt).
+  - **Squeezelite:** Squeezebox receiver (installed via apt).
+  - **Librespot:** Spotify Connect receiver (compiled from source via Cargo).
 
 ## Notes
 
+- **Build Time:** The initial build takes longer because `librespot` is compiled from source using Rust.
 - This is a port of the Moode Audio web interface and player daemon to a standard Docker environment.
 - Hardware-specific features (GPIO, Raspberry Pi specific drivers) are disabled or non-functional.
 - MPD is configured to output to a "Null" output by default. You may need to configure ALSA or PulseAudio forwarding for actual sound output.

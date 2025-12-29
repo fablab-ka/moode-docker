@@ -1,3 +1,18 @@
+# Builder stage for librespot
+FROM debian:trixie-slim AS librespot-builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cargo \
+    rustc \
+    libasound2-dev \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN cargo install librespot --root /usr/local --locked
+
 FROM debian:trixie-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -33,6 +48,9 @@ RUN chmod +x /install-deps.sh \
     && /install-deps.sh \
     && rm -rf /tmp/moode-cfg /install-deps.sh \
     && rm -rf /var/lib/apt/lists/*
+
+# Copy librespot from builder
+COPY --from=librespot-builder /usr/local/bin/librespot /usr/bin/librespot
 
 # Create directories
 RUN mkdir -p /var/www \
