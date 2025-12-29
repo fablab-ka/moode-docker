@@ -48,6 +48,13 @@ RUN mkdir -p /var/www \
     && mkdir -p /run/php \
     && mkdir -p /var/local/php
 
+# Install moodeutl
+COPY source/usr/local/bin/moodeutl /usr/local/bin/moodeutl
+RUN chmod +x /usr/local/bin/moodeutl
+
+# Fix Python symlink
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
 # Copy Moode source
 COPY source/www /var/www
 # Copy local www content to safe location for volume population
