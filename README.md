@@ -20,6 +20,8 @@ cd moode-docker
 git submodule update --init --recursive
 ```
 
+This will fetch both the `source` (Moode web UI) and `imgbuild` (Build configuration) submodules.
+
 ### 2. Run with Docker Compose (Recommended)
 
 Build and start the container in detached mode:

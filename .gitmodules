@@ -2,3 +2,6 @@
 	path = source
 	url = https://github.com/moode-player/moode.git
 	branch = master
+[submodule "imgbuild"]
+	path = imgbuild
+	url = https://github.com/moode-player/imgbuild.git

@@ -26,6 +26,14 @@ RUN apt-get update && apt-get install -y \
     timidity \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Moode dependencies from imgbuild
+COPY imgbuild/moode-cfg /tmp/moode-cfg
+COPY install-deps.sh /install-deps.sh
+RUN chmod +x /install-deps.sh \
+    && /install-deps.sh \
+    && rm -rf /tmp/moode-cfg /install-deps.sh \
+    && rm -rf /var/lib/apt/lists/*
+
 # Create directories
 RUN mkdir -p /var/www \
     && mkdir -p /var/local/www/db \
