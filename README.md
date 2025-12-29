@@ -77,6 +77,7 @@ docker run -d \
   - **Shairport Sync:** AirPlay receiver (installed via apt).
   - **Squeezelite:** Squeezebox receiver (installed via apt).
   - **Librespot:** Spotify Connect receiver (compiled from source via Cargo).
+  - **CamillaDSP:** DSP engine (installed from GitHub release).
 
 ## Notes
 

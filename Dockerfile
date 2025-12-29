@@ -52,6 +52,16 @@ RUN chmod +x /install-deps.sh \
 # Copy librespot from builder
 COPY --from=librespot-builder /usr/local/bin/librespot /usr/bin/librespot
 
+# Download and install CamillaDSP
+RUN curl -L https://github.com/HEnquist/camilladsp/releases/download/v3.0.1/camilladsp-linux-amd64.tar.gz -o /tmp/camilladsp.tar.gz \
+    && tar -xzf /tmp/camilladsp.tar.gz -C /usr/local/bin/ \
+    && rm /tmp/camilladsp.tar.gz \
+    && chmod +x /usr/local/bin/camilladsp
+
+# Create dummy vcgencmd for sysinfo compatibility
+RUN echo '#!/bin/sh\nif [ "$1" = "get_throttled" ]; then echo "throttled=0x0"; else echo "0"; fi' > /usr/local/bin/vcgencmd \
+    && chmod +x /usr/local/bin/vcgencmd
+
 # Create directories
 RUN mkdir -p /var/www \
     && mkdir -p /var/local/www/db \

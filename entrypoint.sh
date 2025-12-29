@@ -36,9 +36,9 @@ touch /var/log/moode.log
 chown www-data:www-data /var/log/moode.log
 
 # Ensure MPD DB file
-# We do not touch the file, MPD will create it. 
-# We just ensure the directory exists and permissions are right.
+# We touch the file to prevent MPD from failing if it's missing.
 mkdir -p /var/lib/mpd
+touch /var/lib/mpd/tag_cache
 chown -R mpd:audio /var/lib/mpd /var/log/mpd
 
 # Initialize DB if missing or empty (check for a known table)
