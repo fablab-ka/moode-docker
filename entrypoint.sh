@@ -36,10 +36,35 @@ touch /var/log/moode.log
 chown www-data:www-data /var/log/moode.log
 
 # Ensure MPD DB file
-if [ ! -f /var/lib/mpd/tag_cache ]; then
-    touch /var/lib/mpd/tag_cache
-fi
+# We do not touch the file, MPD will create it. 
+# We just ensure the directory exists and permissions are right.
+mkdir -p /var/lib/mpd
 chown -R mpd:audio /var/lib/mpd /var/log/mpd
+
+# Initialize DB if missing or empty (check for a known table)
+DB_FILE="/var/local/www/db/moode-sqlite3.db"
+mkdir -p /var/local/www/db
+
+# Check if DB is valid (has cfg_system table)
+DB_VALID=0
+if [ -f "$DB_FILE" ]; then
+    if sqlite3 "$DB_FILE" "SELECT count(*) FROM cfg_system;" >/dev/null 2>&1; then
+        DB_VALID=1
+    fi
+fi
+
+if [ $DB_VALID -eq 0 ]; then
+    echo "Initializing Database (missing or empty)..."
+    if [ -f /usr/share/moode/www-local/db/moode-sqlite3.db.sql ]; then
+         sqlite3 "$DB_FILE" < /usr/share/moode/www-local/db/moode-sqlite3.db.sql
+         echo "Database initialized."
+    else 
+         echo "WARNING: SQL schema not found. Database might be empty."
+    fi
+else
+    echo "Database exists and appears valid."
+fi
+chown -R www-data:www-data /var/local/www/db
 
 # Start PHP-FPM
 echo "Starting PHP-FPM..."
