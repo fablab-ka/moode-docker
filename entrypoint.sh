@@ -25,6 +25,21 @@ fi
 # Ensure permissions
 chown -R www-data:www-data /var/local/www
 
+# Ensure PHP session dir
+if [ ! -d /var/local/php ]; then
+    mkdir -p /var/local/php
+fi
+chown -R www-data:www-data /var/local/php
+
+# Ensure Moode Log
+touch /var/log/moode.log
+chown www-data:www-data /var/log/moode.log
+
+# Ensure MPD DB file
+if [ ! -f /var/lib/mpd/tag_cache ]; then
+    touch /var/lib/mpd/tag_cache
+fi
+chown -R mpd:audio /var/lib/mpd /var/log/mpd
 
 # Start PHP-FPM
 echo "Starting PHP-FPM..."

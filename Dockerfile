@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y \
     procps \
     iproute2 \
     kmod \
+    timidity \
     && rm -rf /var/lib/apt/lists/*
 
 # Create directories
@@ -36,7 +37,8 @@ RUN mkdir -p /var/www \
     && mkdir -p /mnt/NAS \
     && mkdir -p /mnt/USB \
     && mkdir -p /mnt/SD \
-    && mkdir -p /run/php
+    && mkdir -p /run/php \
+    && mkdir -p /var/local/php
 
 # Copy Moode source
 COPY source/www /var/www
@@ -48,9 +50,16 @@ RUN cp -r /usr/share/moode/www-local/* /var/local/www/ \
     && sqlite3 /var/local/www/db/moode-sqlite3.db < /usr/share/moode/www-local/db/moode-sqlite3.db.sql \
     && chown -R www-data:www-data /var/local/www
 
+# Configure Sudoers
+COPY source/etc/sudoers.d /etc/sudoers.d/
+RUN chmod 440 /etc/sudoers.d/*
+
 # Configure Nginx
 # Remove default site
 RUN rm /etc/nginx/sites-enabled/default
+
+# Overwrite main nginx.conf
+COPY source/etc/nginx/nginx.overwrite.conf /etc/nginx/nginx.conf
 
 # Copy Nginx configs from source (adjusting paths as needed)
 # We use the provided 'moode-http.overwrite.conf' as the main site
@@ -80,8 +89,11 @@ RUN echo 'music_directory "/var/lib/mpd/music"' > /etc/mpd.conf \
     && echo '    name "Null Output"' >> /etc/mpd.conf \
     && echo '}' >> /etc/mpd.conf
 
+# Create moode log file
+RUN touch /var/log/moode.log && chown www-data:www-data /var/log/moode.log
+
 # Permissions
-RUN chown -R www-data:www-data /var/www /var/local/www
+RUN chown -R www-data:www-data /var/www /var/local/www /var/local/php
 RUN chown -R mpd:audio /var/lib/mpd /var/log/mpd
 
 # Expose ports
