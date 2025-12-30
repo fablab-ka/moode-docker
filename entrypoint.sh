@@ -31,14 +31,16 @@ if [ ! -d /var/local/php ]; then
 fi
 chown -R www-data:www-data /var/local/php
 
+# Dummy thermal temp for sysinfo
+echo "45000" > /tmp/thermal_temp
+
 # Ensure Moode Log
 touch /var/log/moode.log
 chown www-data:www-data /var/log/moode.log
 
 # Ensure MPD DB file
-# We touch the file to prevent MPD from failing if it's missing.
+# We do not touch the file to prevent MPD from failing with "Database corrupted" if it's 0-byte.
 mkdir -p /var/lib/mpd
-touch /var/lib/mpd/tag_cache
 chown -R mpd:audio /var/lib/mpd /var/log/mpd
 
 # Initialize DB if missing or empty (check for a known table)

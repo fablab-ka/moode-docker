@@ -39,6 +39,7 @@ RUN apt-get update && apt-get install -y \
     iproute2 \
     kmod \
     timidity \
+    nano \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Moode dependencies from imgbuild
@@ -58,10 +59,6 @@ RUN curl -L https://github.com/HEnquist/camilladsp/releases/download/v3.0.1/cami
     && rm /tmp/camilladsp.tar.gz \
     && chmod +x /usr/local/bin/camilladsp
 
-# Create dummy vcgencmd for sysinfo compatibility
-RUN echo '#!/bin/sh\nif [ "$1" = "get_throttled" ]; then echo "throttled=0x0"; else echo "0"; fi' > /usr/local/bin/vcgencmd \
-    && chmod +x /usr/local/bin/vcgencmd
-
 # Create directories
 RUN mkdir -p /var/www \
     && mkdir -p /var/local/www/db \
@@ -80,11 +77,26 @@ RUN mkdir -p /var/www \
 COPY source/usr/local/bin/moodeutl /usr/local/bin/moodeutl
 RUN chmod +x /usr/local/bin/moodeutl
 
+# Fix moodeutl --mooderel and sysinfo
+RUN ln -s /var/www/footer.php /var/www/footer.min.php
+
+# Dummy vcgencmd for sysinfo compatibility
+RUN echo '#!/bin/sh\nif [ "$1" = "get_throttled" ]; then echo "throttled=0x0"; else echo "0"; fi' > /usr/local/bin/vcgencmd \
+    && chmod +x /usr/local/bin/vcgencmd
+
+# Dummy lsblk for sysinfo compatibility
+RUN echo '#!/bin/bash\nif [[ "$*" == *"/dev/disk/by-label/rootfs"* ]]; then\n    if [[ "$*" == *"FSSIZE"* ]]; then echo "100G"; exit 0; fi\n    if [[ "$*" == *"FSUSED"* ]]; then echo "10G"; exit 0; fi\n    if [[ "$*" == *"FSAVAIL"* ]]; then echo "90G"; exit 0; fi\nfi\nexec /usr/bin/lsblk "$@"' > /usr/local/bin/lsblk \
+    && chmod +x /usr/local/bin/lsblk
+
 # Fix Python symlink
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Copy Moode source
 COPY source/www /var/www
+
+# Patch sysinfo scripts for Docker
+RUN sed -i 's|/sys/class/thermal/thermal_zone0/temp|/tmp/thermal_temp|g' /var/www/util/sysinfo.sh \
+    && sed -i 's/\[ $RPIOS_ARCH = "arm64" \]/\[ "$RPIOS_ARCH" = "arm64" \]/g' /var/www/util/sysutil.sh
 # Copy local www content to safe location for volume population
 COPY source/var/local/www /usr/share/moode/www-local
 
